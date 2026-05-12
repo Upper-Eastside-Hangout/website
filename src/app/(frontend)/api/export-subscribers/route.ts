@@ -51,7 +51,7 @@ export async function GET(req: Request) {
     })
     for (const doc of result.docs) {
       const row: Row = Object.create(null)
-      for (const h of CSV_HEADERS) row[h] = (doc as Record<string, unknown>)[h]
+      for (const h of CSV_HEADERS) row[h] = (doc as unknown as Record<string, unknown>)[h]
       rows.push(row)
     }
     if (page >= result.totalPages) break

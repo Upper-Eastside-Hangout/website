@@ -2,6 +2,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { resendAdapter } from '@payloadcms/email-resend'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 
 import { Users } from './collections/Users'
@@ -28,6 +29,13 @@ export default buildConfig({
     },
   },
   editor: lexicalEditor(),
+  // Route Payload's system emails (password reset, account verification) through
+  // the same Resend account that already has uppereastsidehangout.com verified.
+  email: resendAdapter({
+    defaultFromAddress: process.env.RESEND_FROM_EMAIL || 'hello@uppereastsidehangout.com',
+    defaultFromName: process.env.RESEND_FROM_NAME || 'Upper Eastside Hangout',
+    apiKey: process.env.RESEND_API_KEY || '',
+  }),
   collections: [Users, Subscribers, Vendors],
   globals: [HeroSection, NeighborhoodSection, SignupSection, Footer, EmailTemplate, SEO],
   db: postgresAdapter({
