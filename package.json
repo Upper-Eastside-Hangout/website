@@ -1,0 +1,50 @@
+{
+  "name": "upper-eastside-hangout",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "payload generate:importmap && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "payload": "payload",
+    "generate:types": "payload generate:types"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.9.1",
+    "@payloadcms/db-postgres": "^3.34.0",
+    "@payloadcms/next": "^3.34.0",
+    "@payloadcms/richtext-lexical": "^3.34.0",
+    "@payloadcms/ui": "^3.34.0",
+    "@vercel/blob": "^0.27.3",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.15.0",
+    "graphql": "^16.10.0",
+    "marked": "^15.0.6",
+    "next": "~15.4.11",
+    "payload": "^3.34.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.54.2",
+    "resend": "^4.1.1",
+    "sharp": "^0.33.5",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.15",
+    "@types/marked": "^5.0.2",
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.4",
+    "@types/react-dom": "^19.0.2",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.18.0",
+    "eslint-config-next": "~15.4.11",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}

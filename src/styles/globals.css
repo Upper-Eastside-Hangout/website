@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-cream: #F4E8D2;
+  --color-terracotta: #BC623D;
+  --color-forest: #2D3F2C;
+}
+
+html, body {
+  background-color: var(--color-cream);
+  color: var(--color-forest);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-body, Georgia, serif);
+}
+
+/* Respect reduced motion for all framer-motion + CSS animations. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Lightbox/modal scroll lock helper. */
+.no-scroll {
+  overflow: hidden;
+}
+
+/* Subtle aged-paper texture for the cream hero section. Light enough that
+ * solid color reads through cleanly; just a hint of variation. */
+.bg-paper {
+  background-color: #F4E8D2;
+  background-image:
+    radial-gradient(ellipse at top, rgba(255, 230, 190, 0.35) 0%, transparent 60%),
+    radial-gradient(ellipse at bottom, rgba(180, 130, 70, 0.10) 0%, transparent 70%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.40 0 0 0 0 0.20 0 0 0 0.14 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: auto, auto, 320px 320px;
+  background-repeat: no-repeat, no-repeat, repeat;
+}
