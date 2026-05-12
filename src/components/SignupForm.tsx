@@ -82,7 +82,7 @@ export default function SignupForm({ globals }: Props) {
         ) : (
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="mx-auto mt-8 flex w-full max-w-2xl overflow-hidden rounded-sm bg-cream-50 shadow-sm"
+            className="mx-auto mt-8 flex w-full max-w-2xl flex-col gap-3 sm:flex-row sm:gap-0 sm:overflow-hidden sm:rounded-sm sm:bg-cream-50 sm:shadow-sm"
             noValidate
           >
             <label className="sr-only" htmlFor="signup-email">
@@ -94,12 +94,12 @@ export default function SignupForm({ globals }: Props) {
               placeholder="Your email address"
               autoComplete="email"
               {...register('email')}
-              className="flex-1 bg-transparent px-5 py-4 font-body text-base text-forest placeholder:text-forest/40 focus:outline-none"
+              className="w-full rounded-sm bg-cream-50 px-5 py-4 font-body text-base text-forest placeholder:text-forest/40 shadow-sm focus:outline-none sm:flex-1 sm:w-auto sm:rounded-none sm:bg-transparent sm:shadow-none"
             />
             <button
               type="submit"
               disabled={isSubmitting}
-              className="shrink-0 bg-forest px-7 py-4 font-label text-sm tracking-[0.16em] text-cream transition hover:bg-forest-dark disabled:opacity-60"
+              className="w-full rounded-sm bg-forest px-7 py-4 font-label text-sm tracking-[0.16em] text-cream shadow-sm transition hover:bg-forest-dark disabled:opacity-60 sm:w-auto sm:shrink-0 sm:rounded-none sm:shadow-none"
             >
               {isSubmitting ? '…' : globals.buttonText}
             </button>

@@ -40,7 +40,7 @@ export default function Neighborhood({ body }: Props) {
               width={472}
               height={558}
               priority={false}
-              className="h-auto w-full max-w-[360px]"
+              className="h-auto w-full max-w-[270px] md:max-w-[360px]"
             />
           </div>
         </SectionReveal>
