@@ -66,13 +66,9 @@ export async function POST(req: Request) {
   // semantics — never block the signup response on email delivery.
   void (async () => {
     try {
-      const template = (await payload.findGlobal({ slug: 'emailTemplate' })) as {
-        subject: string
-        preheader: string
-        bodyMarkdown: string
-        fromName: string
-        fromEmail: string
-      }
+      const template = (await payload.findGlobal({ slug: 'emailTemplate' })) as Parameters<
+        typeof sendConfirmationEmail
+      >[1]
       await sendConfirmationEmail(email, template)
     } catch (err) {
       console.error('[subscribe] email send failed:', err)
