@@ -19,9 +19,22 @@ import { SEO } from './globals/SEO'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+// Trusted origins for CSRF + CORS. Without these explicitly declared in
+// production, Payload 3 rejects mutations from the admin UI with a generic
+// "You are not allowed to perform this action" error. Include both the
+// custom domain and the *.vercel.app preview URLs.
+const trustedOrigins = [
+  process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000',
+  'https://uppereastsidehangout.com',
+  'https://www.uppereastsidehangout.com',
+  'http://localhost:3000',
+].filter(Boolean)
+
 export default buildConfig({
   serverURL: process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000',
   secret: process.env.PAYLOAD_SECRET || 'dev-secret-replace-in-env',
+  csrf: trustedOrigins,
+  cors: trustedOrigins,
   admin: {
     user: Users.slug,
     meta: {
