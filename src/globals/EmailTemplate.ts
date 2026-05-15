@@ -1,17 +1,4 @@
 import type { GlobalConfig } from 'payload'
-import {
-  lexicalEditor,
-  FixedToolbarFeature,
-  InlineToolbarFeature,
-  BoldFeature,
-  ItalicFeature,
-  UnderlineFeature,
-  LinkFeature,
-  ParagraphFeature,
-  HeadingFeature,
-  UnorderedListFeature,
-  OrderedListFeature,
-} from '@payloadcms/richtext-lexical'
 
 const defaultBody = `Hey,
 
@@ -28,7 +15,7 @@ export const EmailTemplate: GlobalConfig = {
   slug: 'emailTemplate',
   label: 'Confirmation Email',
   access: {
-    read: ({ req }) => Boolean(req.user),
+    read: () => true,
     update: ({ req }) => Boolean(req.user),
   },
   fields: [
@@ -51,20 +38,6 @@ export const EmailTemplate: GlobalConfig = {
         description:
           'Rich-text email body. Use the toolbar to bold, italicize, add links, and create lists. Takes priority over the legacy Markdown field below.',
       },
-      editor: lexicalEditor({
-        features: () => [
-          ParagraphFeature(),
-          HeadingFeature({ enabledHeadingSizes: ['h2', 'h3'] }),
-          BoldFeature(),
-          ItalicFeature(),
-          UnderlineFeature(),
-          LinkFeature(),
-          UnorderedListFeature(),
-          OrderedListFeature(),
-          FixedToolbarFeature(),
-          InlineToolbarFeature(),
-        ],
-      }),
     },
     {
       name: 'bodyMarkdown',
