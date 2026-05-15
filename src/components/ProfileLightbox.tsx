@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { trackPixel } from '@/lib/pixel'
 
 type SignupGlobals = {
   segmentLabel1: string
@@ -111,11 +112,16 @@ export default function ProfileLightbox({
     if (data.segment) payload.segment = data.segment
 
     try {
-      await fetch('/api/profile', {
+      const res = await fetch('/api/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
+      // Meta Pixel: fire CompleteRegistration only on a successful Save.
+      // Skip flow bypasses this function so it never counts as a registration.
+      if (res.ok) {
+        trackPixel('CompleteRegistration', { content_name: 'profile_completion' })
+      }
     } catch (err) {
       console.error('[profile] submit failed:', err)
     } finally {

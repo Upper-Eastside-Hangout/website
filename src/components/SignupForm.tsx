@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import Image from 'next/image'
 import ProfileLightbox from './ProfileLightbox'
+import { trackPixel } from '@/lib/pixel'
 
 type SignupGlobals = {
   heading: string
@@ -45,10 +46,18 @@ export default function SignupForm({ globals }: Props) {
         console.error('[signup] non-OK response:', res.status)
         return
       }
-      const json = (await res.json()) as { subscriberId: string | number }
+      const json = (await res.json()) as {
+        subscriberId: string | number
+        alreadyExisted?: boolean
+      }
       setSubscriberId(json.subscriberId)
       setLightboxOpen(true)
       reset()
+      // Meta Pixel: fire Lead on a NEW email signup. Duplicates re-opening the
+      // lightbox don't count as fresh leads.
+      if (!json.alreadyExisted) {
+        trackPixel('Lead', { content_name: 'email_signup' })
+      }
     } catch (err) {
       console.error('[signup] submit threw:', err)
     }
