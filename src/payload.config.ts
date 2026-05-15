@@ -55,6 +55,10 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
     },
+    // Auto-apply schema changes (new fields, columns) on production boot.
+    // Suitable for a single-developer project; for multi-environment teams
+    // you'd switch to generated migrations instead.
+    push: true,
   }),
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
