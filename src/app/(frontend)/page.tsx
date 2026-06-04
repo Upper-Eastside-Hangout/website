@@ -6,7 +6,12 @@ import SignupForm from '@/components/SignupForm'
 import Footer from '@/components/Footer'
 import { restaurantSchema, parseAddress, normalizeTelephone } from '@/lib/schema'
 
-export const revalidate = 60 // ISR — admin edits land within ~1 min.
+// Skip build-time prerender. Payload's schema push (push: true) only runs at
+// runtime, so if we statically prerender we can hit a "relation does not exist"
+// error for newly-added globals on first deploy. Rendering on each request is
+// fine for a low-traffic landing page; we still cache via Next's per-request
+// fetch dedup and Vercel's CDN edge.
+export const dynamic = 'force-dynamic'
 
 type HeroGlobal = { tagline: string; subtagline: string; ctaButtonText: string }
 type NeighborhoodGlobal = { heading: string; body: string }
@@ -34,13 +39,22 @@ export default async function Page() {
   const payload = await getPayloadClient()
 
   // Run global fetches in parallel.
-  const [hero, neighborhood, signup, footer, navigation] = (await Promise.all([
+  const [hero, neighborhood, signup, footer] = (await Promise.all([
     payload.findGlobal({ slug: 'heroSection' }),
     payload.findGlobal({ slug: 'neighborhoodSection' }),
     payload.findGlobal({ slug: 'signupSection' }),
     payload.findGlobal({ slug: 'footer' }),
-    payload.findGlobal({ slug: 'navigation' }),
-  ])) as [HeroGlobal, NeighborhoodGlobal, SignupGlobal, FooterGlobal, NavigationGlobal]
+  ])) as [HeroGlobal, NeighborhoodGlobal, SignupGlobal, FooterGlobal]
+
+  // Navigation fetch isolated in try/catch — on first deploy after adding the
+  // navigation global, the Postgres tables don't exist until Payload's push
+  // runs at runtime. Until then we render the page with no nav rather than 500.
+  let navigation: NavigationGlobal = { links: [] }
+  try {
+    navigation = (await payload.findGlobal({ slug: 'navigation' })) as NavigationGlobal
+  } catch (err) {
+    console.warn('[page] navigation global not yet provisioned, rendering without nav:', err)
+  }
 
   const url = process.env.NEXT_PUBLIC_SERVER_URL || 'https://uppereastsidehangout.com'
   const addr = parseAddress(footer.address)
