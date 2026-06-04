@@ -15,6 +15,7 @@ import { SignupSection } from './globals/SignupSection'
 import { Footer } from './globals/Footer'
 import { EmailTemplate } from './globals/EmailTemplate'
 import { SEO } from './globals/SEO'
+import { Navigation } from './globals/Navigation'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -50,7 +51,7 @@ export default buildConfig({
     apiKey: process.env.RESEND_API_KEY || '',
   }),
   collections: [Users, Subscribers, Vendors],
-  globals: [HeroSection, NeighborhoodSection, SignupSection, Footer, EmailTemplate, SEO],
+  globals: [Navigation, HeroSection, NeighborhoodSection, SignupSection, Footer, EmailTemplate, SEO],
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URI || '',

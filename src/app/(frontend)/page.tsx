@@ -1,4 +1,5 @@
 import { getPayloadClient } from '@/lib/payload'
+import Header from '@/components/Header'
 import Hero from '@/components/Hero'
 import Neighborhood from '@/components/Neighborhood'
 import SignupForm from '@/components/SignupForm'
@@ -25,17 +26,21 @@ type FooterGlobal = {
   facebookUrl?: string
   copyrightText: string
 }
+type NavigationGlobal = {
+  links?: Array<{ label: string; url: string; openInNewTab?: boolean | null }> | null
+}
 
 export default async function Page() {
   const payload = await getPayloadClient()
 
   // Run global fetches in parallel.
-  const [hero, neighborhood, signup, footer] = (await Promise.all([
+  const [hero, neighborhood, signup, footer, navigation] = (await Promise.all([
     payload.findGlobal({ slug: 'heroSection' }),
     payload.findGlobal({ slug: 'neighborhoodSection' }),
     payload.findGlobal({ slug: 'signupSection' }),
     payload.findGlobal({ slug: 'footer' }),
-  ])) as [HeroGlobal, NeighborhoodGlobal, SignupGlobal, FooterGlobal]
+    payload.findGlobal({ slug: 'navigation' }),
+  ])) as [HeroGlobal, NeighborhoodGlobal, SignupGlobal, FooterGlobal, NavigationGlobal]
 
   const url = process.env.NEXT_PUBLIC_SERVER_URL || 'https://uppereastsidehangout.com'
   const addr = parseAddress(footer.address)
@@ -56,6 +61,8 @@ export default async function Page() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
       />
+
+      <Header links={navigation?.links || []} />
 
       <Hero
         tagline={hero.tagline}
