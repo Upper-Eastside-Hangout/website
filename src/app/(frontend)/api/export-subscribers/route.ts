@@ -8,8 +8,7 @@ const CSV_HEADERS = [
   'email',
   'firstName',
   'lastName',
-  'birthMonth',
-  'birthDay',
+  'birthDate',
   'phone',
   'gender',
   'segment',
@@ -26,6 +25,18 @@ const csvEscape = (val: unknown): string => {
     return `"${s.replace(/"/g, '""')}"`
   }
   return s
+}
+
+/**
+ * Combine birthMonth + birthDay into a single MM/DD string for export.
+ * Returns "" if both are empty, the present one if only one is set.
+ */
+const formatBirthDate = (month: unknown, day: unknown): string => {
+  const m = month == null ? '' : String(month).trim()
+  const d = day == null ? '' : String(day).trim()
+  if (!m && !d) return ''
+  if (m && d) return `${m}/${d}`
+  return m || d
 }
 
 export async function GET(req: Request) {
@@ -50,8 +61,15 @@ export async function GET(req: Request) {
       overrideAccess: true,
     })
     for (const doc of result.docs) {
+      const raw = doc as unknown as Record<string, unknown>
       const row: Row = Object.create(null)
-      for (const h of CSV_HEADERS) row[h] = (doc as unknown as Record<string, unknown>)[h]
+      for (const h of CSV_HEADERS) {
+        if (h === 'birthDate') {
+          row.birthDate = formatBirthDate(raw.birthMonth, raw.birthDay)
+        } else {
+          row[h] = raw[h]
+        }
+      }
       rows.push(row)
     }
     if (page >= result.totalPages) break
