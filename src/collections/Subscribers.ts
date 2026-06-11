@@ -10,6 +10,9 @@ export const Subscribers: CollectionConfig = {
     defaultColumns: ['email', 'firstName', 'lastName', 'segment', 'profileCompleted', 'createdAt'],
     description:
       'Email list. Rows are created by the public signup form via /api/subscribe. Admin-only access.',
+    components: {
+      beforeListTable: ['/components/admin/ExportSubscribersButton#default'],
+    },
   },
   access: {
     // Public signup writes through the /api/subscribe route using a server-side Payload
