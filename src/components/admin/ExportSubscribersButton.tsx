@@ -1,3 +1,5 @@
+'use client'
+
 /**
  * Download-CSV button shown above the Subscribers list in the Payload admin.
  * The /api/export-subscribers endpoint is admin-gated and streams a CSV with
