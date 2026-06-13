@@ -55,11 +55,11 @@ export default async function HomePreview() {
     /* navigation table may not exist yet; render without nav */
   }
 
-  // Vendors — only published, sorted by `order`.
+  // Vendors — only published, sorted alphabetically by name.
   const vendorResult = await payload.find({
     collection: 'vendors',
     where: { published: { equals: true } },
-    sort: 'order',
+    sort: 'name',
     limit: 100,
   })
   const vendors = vendorResult.docs.map((d) => {
@@ -105,10 +105,10 @@ export default async function HomePreview() {
         ctaTarget="#signup"
       />
 
-      <Neighborhood heading={neighborhood.heading} body={neighborhood.body} />
-
-      {/* NEW SECTION — vendor grid */}
+      {/* NEW SECTION — vendor grid, between Hero and Neighborhood */}
       <VendorsSection vendors={vendors} />
+
+      <Neighborhood heading={neighborhood.heading} body={neighborhood.body} />
 
       <SignupForm
         globals={{

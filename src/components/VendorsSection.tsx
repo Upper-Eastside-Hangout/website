@@ -13,7 +13,7 @@ type Props = {
 
 export default function VendorsSection({
   vendors,
-  heading = 'A Few of the Faces',
+  heading = 'Our Featured Vendors',
   eyebrow,
 }: Props) {
   if (!vendors.length) return null
@@ -29,7 +29,7 @@ export default function VendorsSection({
             <h2 className="font-heading text-3xl font-bold leading-[1.05] tracking-[-0.02em] text-forest md:text-5xl">
               {heading}
             </h2>
-            <div className="mx-auto mt-5 flex items-center gap-3 text-terracotta/70" aria-hidden="true">
+            <div className="mt-5 flex items-center justify-center gap-3 text-terracotta/70" aria-hidden="true">
               <span className="h-px w-12 bg-current" />
               <span className="text-sm">✻</span>
               <span className="h-px w-12 bg-current" />

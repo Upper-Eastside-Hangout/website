@@ -64,34 +64,50 @@ const IconLink = ({ href, label, children }: IconLinkProps) => {
 }
 
 export default function VendorCard({ vendor }: Props) {
+  const hasIllustration = Boolean(vendor.illustrationUrl)
+  const hasLogo = Boolean(vendor.logoUrl)
+  // Hover-swap only makes sense when BOTH exist; otherwise we just show
+  // whichever one is provided (no hover state).
+  const hoverSwap = hasIllustration && hasLogo
+
   return (
-    <article className="flex h-full flex-col rounded-sm border border-forest/15 bg-cream-50/70 p-6 text-center shadow-sm">
-      {/* Illustration */}
-      {vendor.illustrationUrl ? (
-        <div className="relative mx-auto mb-4 h-40 w-40 md:h-48 md:w-48">
+    <article className="group flex h-full flex-col rounded-sm border border-forest/15 bg-cream-50 p-6 text-center shadow-sm">
+      {/* Image well — illustration by default, swap to logo on hover when both exist.
+          mix-blend-multiply makes any white background in the PNG blend into the
+          card's cream surface, so vendors don't have to perfectly knock out their
+          PNG backgrounds before uploading. */}
+      <div className="relative mx-auto mb-4 h-40 w-40 md:h-48 md:w-48">
+        {hasIllustration && (
           <Image
-            src={vendor.illustrationUrl}
-            alt=""
-            aria-hidden="true"
+            src={vendor.illustrationUrl as string}
+            alt={hoverSwap ? '' : vendor.name}
+            aria-hidden={hoverSwap ? 'true' : undefined}
             fill
             sizes="(min-width: 768px) 200px, 160px"
-            className="object-contain"
+            className={[
+              'object-contain mix-blend-multiply transition-opacity duration-300',
+              hoverSwap ? 'group-hover:opacity-0' : '',
+            ].join(' ')}
           />
-        </div>
-      ) : vendor.logoUrl ? (
-        <div className="relative mx-auto mb-4 h-40 w-40 md:h-48 md:w-48">
+        )}
+        {hasLogo && (
           <Image
-            src={vendor.logoUrl}
-            alt=""
-            aria-hidden="true"
+            src={vendor.logoUrl as string}
+            alt={hasIllustration ? vendor.name : vendor.name}
             fill
             sizes="(min-width: 768px) 200px, 160px"
-            className="object-contain"
+            className={[
+              'object-contain mix-blend-multiply transition-opacity duration-300',
+              hoverSwap
+                ? 'absolute inset-0 opacity-0 group-hover:opacity-100'
+                : '',
+            ].join(' ')}
           />
-        </div>
-      ) : (
-        <div className="mx-auto mb-4 h-40 w-40 md:h-48 md:w-48 rounded-full bg-forest/10" />
-      )}
+        )}
+        {!hasIllustration && !hasLogo && (
+          <div className="h-full w-full rounded-full bg-forest/10" />
+        )}
+      </div>
 
       {/* Name */}
       <h3 className="font-label text-base tracking-[0.16em] text-forest md:text-lg">
@@ -107,7 +123,7 @@ export default function VendorCard({ vendor }: Props) {
         </p>
       )}
 
-      {/* Action icons — only render if at least one URL exists */}
+      {/* Action icons — only render row if at least one URL exists */}
       {(vendor.instagramUrl || vendor.facebookUrl || vendor.websiteUrl || vendor.menuUrl) && (
         <div className="mt-5 flex items-center justify-center gap-3">
           <IconLink href={vendor.instagramUrl} label={`${vendor.name} on Instagram`}>
