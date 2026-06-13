@@ -1,23 +1,17 @@
 import type { CollectionConfig } from 'payload'
 
 /**
- * PHASE 2 SCAFFOLD — Vendors are NOT rendered on the public site in Phase 0.
- * The collection exists so the admin can populate it ahead of the Phase 2
- * launch, where the "A Few of the Faces" grid will read from here.
- *
- * Note: illustration is a plain text URL field (not a Payload upload relation)
- * because the @payloadcms/storage-vercel-blob plugin has been observed to
- * break the Payload admin in this stack. Images are uploaded via the custom
- * /api/upload route (signed Vercel Blob client uploads) and the resulting URL
- * is pasted here.
+ * Resident vendors — the recurring food/drink operators based at the venue.
+ * Shown in a grid on the homepage. Temporary/event-based pop-up vendors are
+ * NOT stored here; those live in the Events collection as one-off occurrences.
  */
 export const Vendors: CollectionConfig = {
   slug: 'vendors',
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'category', 'published', 'order'],
+    defaultColumns: ['name', 'published', 'order'],
     description:
-      'Phase 2 — vendor grid for "A Few of the Faces." Not rendered on the public site in Phase 0.',
+      'Resident vendors with a permanent presence at the venue. Reorder by changing the Order field.',
   },
   access: {
     read: () => true,
@@ -26,40 +20,74 @@ export const Vendors: CollectionConfig = {
     delete: ({ req }) => Boolean(req.user),
   },
   fields: [
-    { name: 'name', type: 'text', required: true },
     {
-      name: 'category',
-      type: 'select',
+      name: 'name',
+      type: 'text',
       required: true,
-      defaultValue: 'food',
-      options: [
-        { label: 'Food', value: 'food' },
-        { label: 'Drinks', value: 'drinks' },
-        { label: 'Market', value: 'market' },
-        { label: 'Coffee', value: 'coffee' },
-        { label: 'Other', value: 'other' },
-      ],
+      admin: { description: 'Vendor display name (e.g. "Cheese Burger Baby").' },
     },
     {
-      name: 'illustration',
+      name: 'bio',
+      type: 'textarea',
+      admin: {
+        description: 'Short 1–2 sentence description shown on the vendor card.',
+      },
+    },
+    {
+      name: 'logoUrl',
       type: 'text',
       admin: {
         description:
-          'Public Vercel Blob URL for the vendor illustration. Upload via the admin upload widget (TBD) or the /api/upload route, then paste the URL.',
+          'Vendor brand logo as transparent PNG. Drop file at /public/vendors/ and reference as /vendors/your-file.png. Recommended 600×600 px.',
       },
     },
-    { name: 'description', type: 'textarea' },
+    {
+      name: 'illustrationUrl',
+      type: 'text',
+      admin: {
+        description:
+          'Vintage illustration for the card (matches the site’s drawn aesthetic). Transparent PNG, drop at /public/vendors/ and reference as /vendors/your-file.png. Recommended 800×800 px.',
+      },
+    },
+    {
+      name: 'websiteUrl',
+      type: 'text',
+      admin: {
+        description: 'Vendor website. Icon shown on card only when populated.',
+      },
+    },
+    {
+      name: 'menuUrl',
+      type: 'text',
+      admin: {
+        description: 'Direct link to menu. Icon shown on card only when populated.',
+      },
+    },
+    {
+      name: 'instagramUrl',
+      type: 'text',
+      admin: {
+        description: 'Full Instagram profile URL. Icon shown only when populated.',
+      },
+    },
+    {
+      name: 'facebookUrl',
+      type: 'text',
+      admin: {
+        description: 'Full Facebook page URL. Icon shown only when populated.',
+      },
+    },
     {
       name: 'order',
       type: 'number',
       defaultValue: 0,
-      admin: { description: 'Manual sort. Lower numbers render first.' },
+      admin: { description: 'Display order. Lower numbers render first.' },
     },
     {
       name: 'published',
       type: 'checkbox',
-      defaultValue: false,
-      admin: { description: 'Only published vendors appear on the public site (Phase 2).' },
+      defaultValue: true,
+      admin: { description: 'Uncheck to hide a vendor from the public site.' },
     },
   ],
   timestamps: true,

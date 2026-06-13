@@ -8,6 +8,7 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { Users } from './collections/Users'
 import { Subscribers } from './collections/Subscribers'
 import { Vendors } from './collections/Vendors'
+import { Events } from './collections/Events'
 
 import { HeroSection } from './globals/HeroSection'
 import { NeighborhoodSection } from './globals/NeighborhoodSection'
@@ -50,7 +51,7 @@ export default buildConfig({
     defaultFromName: process.env.RESEND_FROM_NAME || 'Upper Eastside Hangout',
     apiKey: process.env.RESEND_API_KEY || '',
   }),
-  collections: [Users, Subscribers, Vendors],
+  collections: [Users, Subscribers, Vendors, Events],
   globals: [Navigation, HeroSection, NeighborhoodSection, SignupSection, Footer, EmailTemplate, SEO],
   db: postgresAdapter({
     pool: {
