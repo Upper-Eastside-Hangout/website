@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import Image from 'next/image'
 
 type Vendor = {
@@ -64,68 +67,88 @@ const IconLink = ({ href, label, children }: IconLinkProps) => {
 }
 
 export default function VendorCard({ vendor }: Props) {
+  const [bioOpen, setBioOpen] = useState(false)
+
   const hasIllustration = Boolean(vendor.illustrationUrl)
   const hasLogo = Boolean(vendor.logoUrl)
-  // Hover-swap only makes sense when BOTH exist; otherwise we just show
-  // whichever one is provided (no hover state).
   const hoverSwap = hasIllustration && hasLogo
+  const hasBio = Boolean(vendor.bio && vendor.bio.trim())
 
   return (
     <article className="group flex h-full flex-col rounded-sm border border-forest/15 bg-cream-50 p-6 text-center shadow-sm">
-      {/* Image well — illustration by default, swap to logo on hover when both exist.
-          mix-blend-multiply makes any white background in the PNG blend into the
-          card's cream surface, so vendors don't have to perfectly knock out their
-          PNG backgrounds before uploading. */}
-      <div className="relative mx-auto mb-4 h-40 w-40 md:h-48 md:w-48">
-        {hasIllustration && (
-          <Image
-            src={vendor.illustrationUrl as string}
-            alt={hoverSwap ? '' : vendor.name}
-            aria-hidden={hoverSwap ? 'true' : undefined}
-            fill
-            sizes="(min-width: 768px) 200px, 160px"
-            className={[
-              'object-contain mix-blend-multiply transition-opacity duration-300',
-              hoverSwap ? 'group-hover:opacity-0' : '',
-            ].join(' ')}
-          />
-        )}
-        {hasLogo && (
-          <Image
-            src={vendor.logoUrl as string}
-            alt={hasIllustration ? vendor.name : vendor.name}
-            fill
-            sizes="(min-width: 768px) 200px, 160px"
-            className={[
-              'object-contain mix-blend-multiply transition-opacity duration-300',
-              hoverSwap
-                ? 'absolute inset-0 opacity-0 group-hover:opacity-100'
-                : '',
-            ].join(' ')}
-          />
-        )}
-        {!hasIllustration && !hasLogo && (
-          <div className="h-full w-full rounded-full bg-forest/10" />
-        )}
-      </div>
-
-      {/* Name */}
+      {/* Title — now at the top */}
       <h3 className="font-label text-base tracking-[0.16em] text-forest md:text-lg">
         {vendor.name}
       </h3>
-
       <div className="mx-auto mt-2 h-px w-10 bg-forest/30" aria-hidden="true" />
 
-      {/* Bio */}
-      {vendor.bio && (
-        <p className="mt-4 flex-1 font-body text-sm leading-relaxed text-forest/85 md:text-base">
-          {vendor.bio}
-        </p>
-      )}
+      {/* Toggle area — image by default, bio on click. Fixed height so the
+          card doesn't reflow when state changes. */}
+      <button
+        type="button"
+        onClick={() => hasBio && setBioOpen((v) => !v)}
+        aria-expanded={bioOpen}
+        aria-label={
+          hasBio ? (bioOpen ? `Hide ${vendor.name} bio` : `Show ${vendor.name} bio`) : vendor.name
+        }
+        disabled={!hasBio}
+        className="relative mx-auto my-5 flex h-40 w-40 cursor-pointer items-center justify-center md:h-48 md:w-48 disabled:cursor-default"
+      >
+        {/* Image layer — hidden when bio is shown */}
+        <div
+          className={[
+            'absolute inset-0 transition-opacity duration-300',
+            bioOpen ? 'opacity-0 pointer-events-none' : 'opacity-100',
+          ].join(' ')}
+        >
+          {hasIllustration && (
+            <Image
+              src={vendor.illustrationUrl as string}
+              alt={hoverSwap ? '' : vendor.name}
+              aria-hidden={hoverSwap ? 'true' : undefined}
+              fill
+              sizes="(min-width: 768px) 200px, 160px"
+              className={[
+                'object-contain mix-blend-multiply transition-opacity duration-300',
+                hoverSwap ? 'group-hover:opacity-0' : '',
+              ].join(' ')}
+            />
+          )}
+          {hasLogo && (
+            <Image
+              src={vendor.logoUrl as string}
+              alt={vendor.name}
+              fill
+              sizes="(min-width: 768px) 200px, 160px"
+              className={[
+                'object-contain mix-blend-multiply transition-opacity duration-300',
+                hoverSwap ? 'absolute inset-0 opacity-0 group-hover:opacity-100' : '',
+              ].join(' ')}
+            />
+          )}
+          {!hasIllustration && !hasLogo && (
+            <div className="h-full w-full rounded-full bg-forest/10" />
+          )}
+        </div>
 
-      {/* Action icons — only render row if at least one URL exists */}
+        {/* Bio layer — visible when bioOpen */}
+        {hasBio && (
+          <div
+            className={[
+              'absolute inset-0 flex items-center justify-center transition-opacity duration-300',
+              bioOpen ? 'opacity-100' : 'opacity-0 pointer-events-none',
+            ].join(' ')}
+          >
+            <p className="font-body text-sm leading-relaxed text-forest/90 md:text-[0.95rem]">
+              {vendor.bio}
+            </p>
+          </div>
+        )}
+      </button>
+
+      {/* Action icons — always visible */}
       {(vendor.instagramUrl || vendor.facebookUrl || vendor.websiteUrl || vendor.menuUrl) && (
-        <div className="mt-5 flex items-center justify-center gap-3">
+        <div className="mt-auto flex items-center justify-center gap-3 pt-2">
           <IconLink href={vendor.instagramUrl} label={`${vendor.name} on Instagram`}>
             <InstagramIcon />
           </IconLink>
