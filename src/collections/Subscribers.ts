@@ -11,7 +11,7 @@ export const Subscribers: CollectionConfig = {
     description:
       'Email list. Rows are created by the public signup form via /api/subscribe. Admin-only access.',
     components: {
-      beforeListTable: ['/components/admin/ExportSubscribersButton#default'],
+      beforeListTable: ['@/components/admin/ExportSubscribersButton#default'],
     },
   },
   access: {
