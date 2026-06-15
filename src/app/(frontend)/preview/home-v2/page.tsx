@@ -32,6 +32,12 @@ type FooterGlobal = {
   hours: string
   instagramUrl?: string
   facebookUrl?: string
+  tiktokUrl?: string
+  youtubeUrl?: string
+  googleBusinessUrl?: string
+  yelpUrl?: string
+  tripadvisorUrl?: string
+  nextdoorUrl?: string
   copyrightText: string
 }
 type NavigationGlobal = {
@@ -127,6 +133,12 @@ export default async function HomePreview() {
         hours={footer.hours}
         instagramUrl={footer.instagramUrl}
         facebookUrl={footer.facebookUrl}
+        tiktokUrl={footer.tiktokUrl}
+        youtubeUrl={footer.youtubeUrl}
+        googleBusinessUrl={footer.googleBusinessUrl}
+        yelpUrl={footer.yelpUrl}
+        tripadvisorUrl={footer.tripadvisorUrl}
+        nextdoorUrl={footer.nextdoorUrl}
         copyrightText={footer.copyrightText}
       />
     </main>
