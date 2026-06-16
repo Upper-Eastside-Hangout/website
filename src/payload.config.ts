@@ -5,10 +5,13 @@ import { postgresAdapter } from '@payloadcms/db-postgres'
 import { resendAdapter } from '@payloadcms/email-resend'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 
+import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
+
 import { Users } from './collections/Users'
 import { Subscribers } from './collections/Subscribers'
 import { Vendors } from './collections/Vendors'
 import { Events } from './collections/Events'
+import { Media } from './collections/Media'
 
 import { HeroSection } from './globals/HeroSection'
 import { NeighborhoodSection } from './globals/NeighborhoodSection'
@@ -51,7 +54,16 @@ export default buildConfig({
     defaultFromName: process.env.RESEND_FROM_NAME || 'Upper Eastside Hangout',
     apiKey: process.env.RESEND_API_KEY || '',
   }),
-  collections: [Users, Subscribers, Vendors, Events],
+  collections: [Users, Subscribers, Vendors, Events, Media],
+  plugins: [
+    vercelBlobStorage({
+      enabled: true,
+      collections: {
+        media: true,
+      },
+      token: process.env.BLOB_READ_WRITE_TOKEN || '',
+    }),
+  ],
   globals: [Navigation, HeroSection, NeighborhoodSection, SignupSection, Footer, EmailTemplate, SEO],
   db: postgresAdapter({
     pool: {

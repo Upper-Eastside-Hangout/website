@@ -9,6 +9,13 @@
 
 /* ---------- Types matching the Events collection shape ---------- */
 
+export type MediaDoc = {
+  id: number | string
+  url?: string | null
+  alt?: string | null
+  filename?: string | null
+}
+
 export type EventDoc = {
   id: string | number
   title: string
@@ -33,13 +40,27 @@ export type EventDoc = {
     price?: number | null
     priceCurrency?: string | null
   }
-  flyerUrl?: string | null
+  /** Upload relation. When depth >= 1 (Payload default), this resolves to the
+   * full Media doc; otherwise it's just the id. */
+  flyer?: MediaDoc | number | string | null
   location: {
     name: string
     address: string
   }
   featured?: boolean | null
   published: boolean
+}
+
+/** Resolve a flyer URL whether the upload relation came back populated or as a bare id. */
+export const flyerUrl = (flyer: EventDoc['flyer']): string | null => {
+  if (!flyer) return null
+  if (typeof flyer === 'number' || typeof flyer === 'string') return null
+  return flyer.url || null
+}
+
+export const flyerAlt = (flyer: EventDoc['flyer'], fallback: string): string => {
+  if (!flyer || typeof flyer === 'number' || typeof flyer === 'string') return fallback
+  return flyer.alt || fallback
 }
 
 export type EventInstance = {
@@ -402,8 +423,9 @@ export const eventToJsonLd = (
           }
         : undefined
 
-  const image = event.flyerUrl
-    ? [event.flyerUrl.startsWith('http') ? event.flyerUrl : `${opts.siteUrl}${event.flyerUrl}`]
+  const rawFlyer = flyerUrl(event.flyer)
+  const image = rawFlyer
+    ? [rawFlyer.startsWith('http') ? rawFlyer : `${opts.siteUrl}${rawFlyer}`]
     : opts.defaultImageUrl
       ? [opts.defaultImageUrl]
       : undefined

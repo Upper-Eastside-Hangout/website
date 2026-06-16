@@ -9,6 +9,7 @@ import {
   eventToJsonLd,
   formatEventDate,
   formatEventTimeRange,
+  flyerUrl,
   CATEGORY_LABELS,
   type EventDoc,
 } from '@/lib/events'
@@ -51,10 +52,11 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   if (!event) return { title: 'Event not found' }
 
   const url = process.env.NEXT_PUBLIC_SERVER_URL || 'https://uppereastsidehangout.com'
-  const flyer = event.flyerUrl
-    ? event.flyerUrl.startsWith('http')
-      ? event.flyerUrl
-      : `${url}${event.flyerUrl}`
+  const rawFlyer = flyerUrl(event.flyer)
+  const flyer = rawFlyer
+    ? rawFlyer.startsWith('http')
+      ? rawFlyer
+      : `${url}${rawFlyer}`
     : `${url}/og-image.jpg`
 
   return {
@@ -102,6 +104,8 @@ export default async function EventDetailPage({ params }: Args) {
   // Next 5 upcoming instances for recurring events
   const upcomingList = upcoming.slice(0, 5)
 
+  const rawFlyer = flyerUrl(event.flyer)
+
   return (
     <main>
       {ld && (
@@ -132,10 +136,10 @@ export default async function EventDetailPage({ params }: Args) {
           </div>
 
           {/* Flyer */}
-          {event.flyerUrl && (
+          {rawFlyer && (
             <div className="relative mx-auto mt-8 aspect-[1200/628] w-full max-w-2xl overflow-hidden rounded-sm bg-cream-50">
               <Image
-                src={event.flyerUrl}
+                src={rawFlyer}
                 alt={`${event.title} flyer`}
                 fill
                 sizes="(min-width: 768px) 672px, 100vw"

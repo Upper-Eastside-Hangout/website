@@ -17,6 +17,7 @@
     "@payloadcms/email-resend": "^3.34.0",
     "@payloadcms/next": "^3.34.0",
     "@payloadcms/richtext-lexical": "^3.34.0",
+    "@payloadcms/storage-vercel-blob": "^3.84.1",
     "@payloadcms/ui": "^3.34.0",
     "@vercel/blob": "^0.27.3",
     "clsx": "^2.1.1",

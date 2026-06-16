@@ -7,6 +7,7 @@ import {
   type EventInstance,
   CATEGORY_LABELS,
   formatEventTimeRange,
+  flyerUrl,
 } from '@/lib/events'
 
 type Props = {
@@ -66,7 +67,8 @@ const FlyerIcon = () => (
 export default function EventCard({ instance }: Props) {
   const { event, startsAt, endsAt } = instance
   const [flyerOpen, setFlyerOpen] = useState(false)
-  const hasFlyer = Boolean(event.flyerUrl)
+  const flyer = flyerUrl(event.flyer)
+  const hasFlyer = Boolean(flyer)
 
   const timeRange = formatEventTimeRange(
     startsAt,
@@ -122,7 +124,7 @@ export default function EventCard({ instance }: Props) {
         <div className="pointer-events-none invisible absolute left-1/2 top-full z-30 mt-2 hidden -translate-x-1/2 rounded-sm border border-forest/20 bg-cream-50 p-2 opacity-0 shadow-xl transition-opacity duration-200 group-hover:visible group-hover:opacity-100 md:block">
           <div className="relative h-[210px] w-[400px]">
             <Image
-              src={event.flyerUrl as string}
+              src={flyer as string}
               alt={`${event.title} flyer`}
               fill
               sizes="400px"
@@ -157,7 +159,7 @@ export default function EventCard({ instance }: Props) {
             </button>
             <div className="relative aspect-[1200/628] w-full overflow-hidden rounded-sm bg-cream-50">
               <Image
-                src={event.flyerUrl as string}
+                src={flyer as string}
                 alt={`${event.title} flyer`}
                 fill
                 sizes="(min-width: 768px) 768px, 100vw"

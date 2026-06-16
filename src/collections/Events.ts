@@ -1,22 +1,22 @@
 import type { CollectionConfig } from 'payload'
 
 /**
- * Events at the venue. Supports one-time events, weekly/biweekly recurring
- * (e.g. Taco Tuesday), monthly patterns (e.g. first Friday), and per-event
- * exclusions for skipping individual occurrences.
+ * Events at the venue. Top-level identity fields are always visible; the
+ * heavier sections (Schedule, Recurrence, Tickets, Media, Location) live in
+ * tabs so the form fits on screen without long scrolling. Row layouts pack
+ * narrow fields side-by-side inside each tab.
  *
- * Categories map to schema.org Event subtypes so Google Events Discovery can
- * surface the right kind of card (SportsEvent, MusicEvent, FoodEvent, etc.).
- *
- * The slug field powers the /events/[slug] detail page URLs.
+ * Recurrence supports one-time, weekly/biweekly (day-of-week pick), and
+ * monthly-by-weekday. schema.org JSON-LD per instance powers Google Events
+ * Discovery from the /events/[slug] pages.
  */
 export const Events: CollectionConfig = {
   slug: 'events',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'category', 'startDateTime', 'recurrence', 'published'],
+    defaultColumns: ['title', 'category', 'published'],
     description:
-      'All events at the venue. Recurring entries (weekly trivia, monthly markets) live as a single entry with a recurrence rule.',
+      'Events at the venue. Recurring entries live as a single record with a recurrence rule.',
   },
   access: {
     read: () => true,
@@ -25,295 +25,326 @@ export const Events: CollectionConfig = {
     delete: ({ req }) => Boolean(req.user),
   },
   fields: [
-    // ---------- Identity ----------
+    // ===== Always-visible identity fields =====
     {
       name: 'title',
       type: 'text',
       required: true,
-      admin: { description: 'Event name (e.g. "World Cup: Argentina vs. Brazil").' },
+      admin: { placeholder: 'World Cup: Argentina vs. Brazil' },
     },
     {
-      name: 'slug',
-      type: 'text',
-      required: true,
-      unique: true,
-      index: true,
-      admin: {
-        description:
-          'URL-safe identifier for the /events/[slug] detail page. Use lowercase letters, numbers, and hyphens (e.g. "world-cup-arg-bra").',
-      },
-    },
-    {
-      name: 'category',
-      type: 'select',
-      required: true,
-      defaultValue: 'specialEvent',
-      options: [
-        { label: 'Sports Screening', value: 'sportsScreening' },
-        { label: 'Movie Screening', value: 'movieScreening' },
-        { label: 'Live Music', value: 'liveMusic' },
-        { label: 'DJ Set', value: 'djSet' },
-        { label: 'Performance', value: 'performance' },
-        { label: 'Comedy', value: 'comedy' },
-        { label: 'Trivia Night', value: 'trivia' },
-        { label: 'Game Night', value: 'gameNight' },
-        { label: 'Tasting', value: 'tasting' },
-        { label: 'Food Festival', value: 'foodFestival' },
-        { label: 'Market', value: 'market' },
-        { label: 'Record Fair', value: 'recordFair' },
-        { label: 'Pop-Up', value: 'popUp' },
-        { label: 'Kids Event', value: 'kidsEvent' },
-        { label: 'Workshop / Class', value: 'workshop' },
-        { label: 'Promotion (Taco Tuesday etc.)', value: 'promotion' },
-        { label: 'Community / Meetup', value: 'community' },
-        { label: 'Special Event', value: 'specialEvent' },
+      type: 'row',
+      fields: [
+        {
+          name: 'slug',
+          type: 'text',
+          required: true,
+          unique: true,
+          index: true,
+          admin: {
+            width: '50%',
+            description: 'URL path: /events/[slug]. Lowercase, hyphens only.',
+            placeholder: 'world-cup-arg-bra',
+          },
+        },
+        {
+          name: 'category',
+          type: 'select',
+          required: true,
+          defaultValue: 'specialEvent',
+          admin: { width: '50%' },
+          options: [
+            { label: 'Sports Screening', value: 'sportsScreening' },
+            { label: 'Movie Screening', value: 'movieScreening' },
+            { label: 'Live Music', value: 'liveMusic' },
+            { label: 'DJ Set', value: 'djSet' },
+            { label: 'Performance', value: 'performance' },
+            { label: 'Comedy', value: 'comedy' },
+            { label: 'Trivia Night', value: 'trivia' },
+            { label: 'Game Night', value: 'gameNight' },
+            { label: 'Tasting', value: 'tasting' },
+            { label: 'Food Festival', value: 'foodFestival' },
+            { label: 'Market', value: 'market' },
+            { label: 'Record Fair', value: 'recordFair' },
+            { label: 'Pop-Up', value: 'popUp' },
+            { label: 'Kids Event', value: 'kidsEvent' },
+            { label: 'Workshop / Class', value: 'workshop' },
+            { label: 'Promotion (Taco Tuesday etc.)', value: 'promotion' },
+            { label: 'Community / Meetup', value: 'community' },
+            { label: 'Special Event', value: 'specialEvent' },
+          ],
+        },
       ],
     },
     {
-      name: 'description',
-      type: 'textarea',
-      admin: {
-        description:
-          'Short description shown on the event detail page. Supports Markdown for **bold**, *italic*, and [links](https://example.com).',
-      },
-    },
-
-    // ---------- When ----------
-    {
-      type: 'group',
-      name: 'schedule',
-      label: 'Schedule',
+      type: 'row',
       fields: [
         {
-          name: 'startDateTime',
-          type: 'date',
-          required: true,
-          admin: {
-            date: { pickerAppearance: 'dayAndTime' },
-            description:
-              'For recurring events, this is the FIRST occurrence date+time. The system generates future instances from here.',
-          },
-        },
-        {
-          name: 'endDateTime',
-          type: 'date',
-          admin: {
-            date: { pickerAppearance: 'dayAndTime' },
-            description:
-              'When the event ends. Required for sports/movies/concerts so we can schema the duration. Leave blank for promos/all-day events.',
-          },
-        },
-        {
-          name: 'isAllDay',
+          name: 'featured',
           type: 'checkbox',
           defaultValue: false,
-          admin: { description: 'Check if the event runs all day (no specific time).' },
+          admin: { width: '50%', description: 'Highlight on homepage upcoming list.' },
+        },
+        {
+          name: 'published',
+          type: 'checkbox',
+          defaultValue: false,
+          admin: { width: '50%', description: 'Uncheck to keep as draft.' },
         },
       ],
     },
 
-    // ---------- Recurrence ----------
+    // ===== Tabs =====
     {
-      type: 'group',
-      name: 'recurrence',
-      label: 'Recurrence',
-      admin: {
-        description:
-          'Leave Pattern as "None" for one-time events. Use Weekly/Biweekly for things like Taco Tuesday or Trivia; Monthly for "first Friday of the month" style events.',
-      },
-      fields: [
+      type: 'tabs',
+      tabs: [
+        // --- Schedule + Recurrence ---
         {
-          name: 'pattern',
-          type: 'select',
-          defaultValue: 'none',
-          options: [
-            { label: 'None (one-time event)', value: 'none' },
-            { label: 'Weekly', value: 'weekly' },
-            { label: 'Biweekly (every 2 weeks)', value: 'biweekly' },
-            { label: 'Monthly (specific weekday pattern)', value: 'monthly' },
-          ],
-        },
-        {
-          name: 'weekdays',
-          type: 'select',
-          hasMany: true,
-          options: [
-            { label: 'Monday', value: 'monday' },
-            { label: 'Tuesday', value: 'tuesday' },
-            { label: 'Wednesday', value: 'wednesday' },
-            { label: 'Thursday', value: 'thursday' },
-            { label: 'Friday', value: 'friday' },
-            { label: 'Saturday', value: 'saturday' },
-            { label: 'Sunday', value: 'sunday' },
-          ],
-          admin: {
-            description:
-              'For Weekly/Biweekly only. Which days of the week the event repeats on.',
-            condition: (_, { recurrence }) =>
-              recurrence?.pattern === 'weekly' || recurrence?.pattern === 'biweekly',
-          },
-        },
-        {
-          name: 'monthlyPattern',
-          type: 'select',
-          options: [
-            { label: 'First Monday of the month', value: 'firstMonday' },
-            { label: 'First Tuesday of the month', value: 'firstTuesday' },
-            { label: 'First Wednesday of the month', value: 'firstWednesday' },
-            { label: 'First Thursday of the month', value: 'firstThursday' },
-            { label: 'First Friday of the month', value: 'firstFriday' },
-            { label: 'First Saturday of the month', value: 'firstSaturday' },
-            { label: 'First Sunday of the month', value: 'firstSunday' },
-            { label: 'Second Monday', value: 'secondMonday' },
-            { label: 'Second Tuesday', value: 'secondTuesday' },
-            { label: 'Second Wednesday', value: 'secondWednesday' },
-            { label: 'Second Thursday', value: 'secondThursday' },
-            { label: 'Second Friday', value: 'secondFriday' },
-            { label: 'Second Saturday', value: 'secondSaturday' },
-            { label: 'Second Sunday', value: 'secondSunday' },
-            { label: 'Third Monday', value: 'thirdMonday' },
-            { label: 'Third Tuesday', value: 'thirdTuesday' },
-            { label: 'Third Wednesday', value: 'thirdWednesday' },
-            { label: 'Third Thursday', value: 'thirdThursday' },
-            { label: 'Third Friday', value: 'thirdFriday' },
-            { label: 'Third Saturday', value: 'thirdSaturday' },
-            { label: 'Third Sunday', value: 'thirdSunday' },
-            { label: 'Last Monday of the month', value: 'lastMonday' },
-            { label: 'Last Tuesday', value: 'lastTuesday' },
-            { label: 'Last Wednesday', value: 'lastWednesday' },
-            { label: 'Last Thursday', value: 'lastThursday' },
-            { label: 'Last Friday', value: 'lastFriday' },
-            { label: 'Last Saturday', value: 'lastSaturday' },
-            { label: 'Last Sunday', value: 'lastSunday' },
-          ],
-          admin: {
-            description: 'For Monthly only. Which weekday of the month the event falls on.',
-            condition: (_, { recurrence }) => recurrence?.pattern === 'monthly',
-          },
-        },
-        {
-          name: 'endDate',
-          type: 'date',
-          admin: {
-            date: { pickerAppearance: 'dayOnly' },
-            description:
-              'Optional. If set, the recurring event stops generating instances after this date. Leave blank for "indefinite".',
-            condition: (_, { recurrence }) =>
-              recurrence?.pattern && recurrence.pattern !== 'none',
-          },
-        },
-        {
-          name: 'excludedDates',
-          type: 'array',
-          labels: { singular: 'Excluded Date', plural: 'Excluded Dates' },
-          admin: {
-            description:
-              'Specific dates to skip (e.g. holidays). Add a row per date.',
-            condition: (_, { recurrence }) =>
-              recurrence?.pattern && recurrence.pattern !== 'none',
-          },
+          label: 'When',
+          description:
+            'For recurring events (Taco Tuesday, weekly trivia), set Schedule to the FIRST occurrence and use Recurrence below.',
           fields: [
             {
-              name: 'date',
-              type: 'date',
-              required: true,
-              admin: { date: { pickerAppearance: 'dayOnly' } },
+              type: 'group',
+              name: 'schedule',
+              label: 'Schedule',
+              fields: [
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'startDateTime',
+                      type: 'date',
+                      required: true,
+                      admin: {
+                        width: '50%',
+                        date: { pickerAppearance: 'dayAndTime' },
+                      },
+                    },
+                    {
+                      name: 'endDateTime',
+                      type: 'date',
+                      admin: {
+                        width: '50%',
+                        date: { pickerAppearance: 'dayAndTime' },
+                        description: 'Optional.',
+                      },
+                    },
+                  ],
+                },
+                {
+                  name: 'isAllDay',
+                  type: 'checkbox',
+                  defaultValue: false,
+                  admin: { description: 'Event runs all day.' },
+                },
+              ],
+            },
+            {
+              type: 'group',
+              name: 'recurrence',
+              label: 'Recurrence',
+              fields: [
+                {
+                  name: 'pattern',
+                  type: 'select',
+                  defaultValue: 'none',
+                  options: [
+                    { label: 'None (one-time)', value: 'none' },
+                    { label: 'Weekly', value: 'weekly' },
+                    { label: 'Biweekly', value: 'biweekly' },
+                    { label: 'Monthly (specific weekday)', value: 'monthly' },
+                  ],
+                },
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'weekdays',
+                      type: 'select',
+                      hasMany: true,
+                      options: [
+                        { label: 'Mon', value: 'monday' },
+                        { label: 'Tue', value: 'tuesday' },
+                        { label: 'Wed', value: 'wednesday' },
+                        { label: 'Thu', value: 'thursday' },
+                        { label: 'Fri', value: 'friday' },
+                        { label: 'Sat', value: 'saturday' },
+                        { label: 'Sun', value: 'sunday' },
+                      ],
+                      admin: {
+                        width: '60%',
+                        description: 'Days of week.',
+                        condition: (_, siblingData: { pattern?: string } | undefined) =>
+                          siblingData?.pattern === 'weekly' || siblingData?.pattern === 'biweekly',
+                      },
+                    },
+                    {
+                      name: 'endDate',
+                      type: 'date',
+                      admin: {
+                        width: '40%',
+                        date: { pickerAppearance: 'dayOnly' },
+                        description: 'Optional end.',
+                        condition: (_, siblingData: { pattern?: string } | undefined) =>
+                          Boolean(siblingData?.pattern) && siblingData?.pattern !== 'none',
+                      },
+                    },
+                  ],
+                },
+                {
+                  name: 'monthlyPattern',
+                  type: 'select',
+                  admin: {
+                    description: 'Which weekday of the month.',
+                    condition: (_, siblingData: { pattern?: string } | undefined) =>
+                      siblingData?.pattern === 'monthly',
+                  },
+                  options: [
+                    'firstMonday', 'firstTuesday', 'firstWednesday', 'firstThursday',
+                    'firstFriday', 'firstSaturday', 'firstSunday',
+                    'secondMonday', 'secondTuesday', 'secondWednesday', 'secondThursday',
+                    'secondFriday', 'secondSaturday', 'secondSunday',
+                    'thirdMonday', 'thirdTuesday', 'thirdWednesday', 'thirdThursday',
+                    'thirdFriday', 'thirdSaturday', 'thirdSunday',
+                    'lastMonday', 'lastTuesday', 'lastWednesday', 'lastThursday',
+                    'lastFriday', 'lastSaturday', 'lastSunday',
+                  ].map((v) => ({
+                    label: v.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase()),
+                    value: v,
+                  })),
+                },
+                {
+                  name: 'excludedDates',
+                  type: 'array',
+                  labels: { singular: 'Skip Date', plural: 'Skip Dates' },
+                  admin: {
+                    description: 'Specific dates to skip (e.g. holidays).',
+                    condition: (_, siblingData: { pattern?: string } | undefined) =>
+                      Boolean(siblingData?.pattern) && siblingData?.pattern !== 'none',
+                  },
+                  fields: [
+                    {
+                      name: 'date',
+                      type: 'date',
+                      required: true,
+                      admin: { date: { pickerAppearance: 'dayOnly' } },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+
+        // --- Tickets ---
+        {
+          label: 'Tickets',
+          fields: [
+            {
+              type: 'group',
+              name: 'attendance',
+              label: false,
+              fields: [
+                {
+                  name: 'type',
+                  type: 'select',
+                  required: true,
+                  defaultValue: 'open',
+                  options: [
+                    { label: 'Open to public (no RSVP)', value: 'open' },
+                    { label: 'Free RSVP required', value: 'freeRSVP' },
+                    { label: 'Paid ticket', value: 'paidTicket' },
+                  ],
+                },
+                {
+                  name: 'registrationUrl',
+                  type: 'text',
+                  admin: {
+                    description: 'RSVP or ticket purchase URL.',
+                    condition: (_, siblingData: { type?: string } | undefined) =>
+                      siblingData?.type === 'freeRSVP' || siblingData?.type === 'paidTicket',
+                  },
+                },
+                {
+                  type: 'row',
+                  admin: {
+                    condition: (_, siblingData: { type?: string } | undefined) =>
+                      siblingData?.type === 'paidTicket',
+                  },
+                  fields: [
+                    {
+                      name: 'price',
+                      type: 'number',
+                      admin: { width: '50%', description: 'Numeric (e.g. 15).' },
+                    },
+                    {
+                      name: 'priceCurrency',
+                      type: 'text',
+                      defaultValue: 'USD',
+                      admin: { width: '50%', description: 'ISO code.' },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+
+        // --- Media & Description ---
+        {
+          label: 'Media & Description',
+          fields: [
+            {
+              name: 'flyer',
+              type: 'upload',
+              relationTo: 'media',
+              admin: {
+                description: 'Upload event flyer. Recommended 1200×628 (Open Graph format).',
+              },
+            },
+            {
+              name: 'description',
+              type: 'textarea',
+              admin: {
+                description: 'Markdown supported: **bold**, *italic*, [links](https://example.com).',
+              },
+            },
+          ],
+        },
+
+        // --- Location ---
+        {
+          label: 'Location',
+          description: 'Defaults to the venue. Override only for off-site events.',
+          fields: [
+            {
+              type: 'group',
+              name: 'location',
+              label: false,
+              fields: [
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'name',
+                      type: 'text',
+                      defaultValue: 'Upper Eastside Hangout',
+                      admin: { width: '40%' },
+                    },
+                    {
+                      name: 'address',
+                      type: 'text',
+                      defaultValue: '701 NE 79th St, Miami, FL 33138',
+                      admin: { width: '60%' },
+                    },
+                  ],
+                },
+              ],
             },
           ],
         },
       ],
-    },
-
-    // ---------- Attendance / Tickets ----------
-    {
-      type: 'group',
-      name: 'attendance',
-      label: 'Attendance & Tickets',
-      fields: [
-        {
-          name: 'type',
-          type: 'select',
-          required: true,
-          defaultValue: 'open',
-          options: [
-            { label: 'Open to the public (no RSVP)', value: 'open' },
-            { label: 'Free RSVP required', value: 'freeRSVP' },
-            { label: 'Paid ticket', value: 'paidTicket' },
-          ],
-        },
-        {
-          name: 'registrationUrl',
-          type: 'text',
-          admin: {
-            description: 'RSVP or ticket purchase URL. Required for Free RSVP and Paid Ticket types.',
-            condition: (_, { attendance }) =>
-              attendance?.type === 'freeRSVP' || attendance?.type === 'paidTicket',
-          },
-        },
-        {
-          name: 'price',
-          type: 'number',
-          admin: {
-            description: 'Ticket price (numeric only, e.g. 15 for $15).',
-            condition: (_, { attendance }) => attendance?.type === 'paidTicket',
-          },
-        },
-        {
-          name: 'priceCurrency',
-          type: 'text',
-          defaultValue: 'USD',
-          admin: {
-            description: 'ISO currency code (USD, EUR, etc.).',
-            condition: (_, { attendance }) => attendance?.type === 'paidTicket',
-          },
-        },
-      ],
-    },
-
-    // ---------- Media ----------
-    {
-      name: 'flyerUrl',
-      type: 'text',
-      admin: {
-        description:
-          'Optional event flyer at 1200×628 px (Open Graph–compatible). Drop file in /public/events/ and reference as /events/your-file.jpg. Used for hover preview and social sharing.',
-      },
-    },
-
-    // ---------- Location ----------
-    {
-      type: 'group',
-      name: 'location',
-      label: 'Location',
-      admin: {
-        description: 'Defaults to the venue. Override for off-site events.',
-      },
-      fields: [
-        {
-          name: 'name',
-          type: 'text',
-          defaultValue: 'Upper Eastside Hangout',
-        },
-        {
-          name: 'address',
-          type: 'text',
-          defaultValue: '701 NE 79th St, Miami, FL 33138',
-        },
-      ],
-    },
-
-    // ---------- Publishing ----------
-    {
-      name: 'featured',
-      type: 'checkbox',
-      defaultValue: false,
-      admin: { description: 'Highlight on the events page and homepage upcoming list.' },
-    },
-    {
-      name: 'published',
-      type: 'checkbox',
-      defaultValue: false,
-      admin: { description: 'Uncheck to keep as draft. Drafts are hidden from the public site.' },
     },
   ],
   timestamps: true,
