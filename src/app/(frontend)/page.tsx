@@ -2,6 +2,7 @@ import { getPayloadClient } from '@/lib/payload'
 import Header from '@/components/Header'
 import Hero from '@/components/Hero'
 import Neighborhood from '@/components/Neighborhood'
+import VendorsSection from '@/components/VendorsSection'
 import SignupForm from '@/components/SignupForm'
 import Footer from '@/components/Footer'
 import { restaurantSchema, parseAddress, normalizeTelephone } from '@/lib/schema'
@@ -62,6 +63,27 @@ export default async function Page() {
     console.warn('[page] navigation global not yet provisioned, rendering without nav:', err)
   }
 
+  // Vendors — only published, sorted alphabetically by name.
+  const vendorResult = await payload.find({
+    collection: 'vendors',
+    where: { published: { equals: true } },
+    sort: 'name',
+    limit: 100,
+  })
+  const vendors = vendorResult.docs.map((d) => {
+    const raw = d as unknown as Record<string, unknown>
+    return {
+      name: String(raw.name || ''),
+      bio: (raw.bio as string) || null,
+      logoUrl: (raw.logoUrl as string) || null,
+      illustrationUrl: (raw.illustrationUrl as string) || null,
+      websiteUrl: (raw.websiteUrl as string) || null,
+      menuUrl: (raw.menuUrl as string) || null,
+      instagramUrl: (raw.instagramUrl as string) || null,
+      facebookUrl: (raw.facebookUrl as string) || null,
+    }
+  })
+
   const url = process.env.NEXT_PUBLIC_SERVER_URL || 'https://uppereastsidehangout.com'
   const addr = parseAddress(footer.address)
   const ld = restaurantSchema({
@@ -91,7 +113,7 @@ export default async function Page() {
         ctaTarget="#signup"
       />
 
-      {/* PHASE 2: vendor grid renders here ("A Few of the Faces") */}
+      <VendorsSection vendors={vendors} />
 
       <Neighborhood heading={neighborhood.heading} body={neighborhood.body} />
 
