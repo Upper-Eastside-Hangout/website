@@ -102,7 +102,7 @@ export const Events: CollectionConfig = {
         {
           label: 'When',
           description:
-            'For recurring events (Taco Tuesday, weekly trivia), set Schedule to the FIRST occurrence and use Recurrence below.',
+            "Set the Schedule to the first occurrence's date and time. For recurring events, the TIME (and start-to-end duration) is reused for every instance.",
           fields: [
             {
               type: 'group',
@@ -119,6 +119,8 @@ export const Events: CollectionConfig = {
                       admin: {
                         width: '50%',
                         date: { pickerAppearance: 'dayAndTime' },
+                        description:
+                          'Date + time of the first occurrence. For recurring events, the TIME repeats each instance.',
                       },
                     },
                     {
@@ -127,7 +129,18 @@ export const Events: CollectionConfig = {
                       admin: {
                         width: '50%',
                         date: { pickerAppearance: 'dayAndTime' },
-                        description: 'Optional.',
+                        description:
+                          'When the event ends. Required for recurring events with a specific end time (trivia, concerts, screenings). The duration between start and end is applied to every recurring instance.',
+                      },
+                      validate: (
+                        value: unknown,
+                        { data }: { data?: { recurrence?: { pattern?: string } } },
+                      ) => {
+                        const pattern = data?.recurrence?.pattern
+                        if (pattern && pattern !== 'none' && !value) {
+                          return 'End Date/Time is required for recurring events so each instance has a proper end time.'
+                        }
+                        return true
                       },
                     },
                   ],
