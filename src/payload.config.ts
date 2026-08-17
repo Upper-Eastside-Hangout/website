@@ -12,6 +12,7 @@ import { Subscribers } from './collections/Subscribers'
 import { Vendors } from './collections/Vendors'
 import { Events } from './collections/Events'
 import { Media } from './collections/Media'
+import { Redirects } from './collections/Redirects'
 
 import { HeroSection } from './globals/HeroSection'
 import { NeighborhoodSection } from './globals/NeighborhoodSection'
@@ -54,7 +55,7 @@ export default buildConfig({
     defaultFromName: process.env.RESEND_FROM_NAME || 'Upper Eastside Hangout',
     apiKey: process.env.RESEND_API_KEY || '',
   }),
-  collections: [Users, Subscribers, Vendors, Events, Media],
+  collections: [Users, Subscribers, Vendors, Events, Media, Redirects],
   plugins: [
     vercelBlobStorage({
       enabled: true,

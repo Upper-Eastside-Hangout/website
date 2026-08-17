@@ -9,11 +9,23 @@
 
 /* ---------- Types matching the Events collection shape ---------- */
 
+export type MediaSize = {
+  url?: string | null
+  filename?: string | null
+  width?: number | null
+  height?: number | null
+}
+
 export type MediaDoc = {
   id: number | string
   url?: string | null
   alt?: string | null
   filename?: string | null
+  /** Payload/Sharp auto-generated crops. `og` is 1200x628 for social cards. */
+  sizes?: {
+    og?: MediaSize | null
+    thumb?: MediaSize | null
+  } | null
 }
 
 export type EventDoc = {
@@ -51,11 +63,16 @@ export type EventDoc = {
   published: boolean
 }
 
-/** Resolve a flyer URL whether the upload relation came back populated or as a bare id. */
+/**
+ * Resolve a flyer URL from the upload relation. Prefers the "og" size
+ * (1200x628 center-crop) when available, so displays and social cards always
+ * get a consistent aspect ratio regardless of the source image dimensions.
+ * Falls back to the original if the sized version isn't generated yet.
+ */
 export const flyerUrl = (flyer: EventDoc['flyer']): string | null => {
   if (!flyer) return null
   if (typeof flyer === 'number' || typeof flyer === 'string') return null
-  return flyer.url || null
+  return flyer.sizes?.og?.url || flyer.url || null
 }
 
 export const flyerAlt = (flyer: EventDoc['flyer'], fallback: string): string => {
