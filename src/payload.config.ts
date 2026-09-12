@@ -1,5 +1,6 @@
 import path from 'path'
 import { fileURLToPath } from 'url'
+import sharp from 'sharp'
 import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { resendAdapter } from '@payloadcms/email-resend'
@@ -48,6 +49,12 @@ export default buildConfig({
     },
   },
   editor: lexicalEditor(),
+  // Sharp powers image resizing (imageSizes on Media) AND the Vercel Blob
+  // storage plugin's upload pipeline. Without this passed to buildConfig,
+  // Payload silently skips resize crops and the storage plugin fails to
+  // intercept — new uploads land at Payload's local /api/media/file/ URL
+  // (which returns 404 on Vercel's stateless serverless runtime).
+  sharp,
   // Route Payload's system emails (password reset, account verification) through
   // the same Resend account that already has uppereastsidehangout.com verified.
   email: resendAdapter({
