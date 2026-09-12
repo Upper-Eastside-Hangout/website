@@ -67,7 +67,13 @@ export default buildConfig({
     vercelBlobStorage({
       enabled: true,
       collections: {
-        media: true,
+        // disablePayloadAccessControl bypasses Payload's /api/media/file proxy
+        // and stores direct Blob URLs (https://<store>.public.blob.vercel-storage.com/<file>)
+        // in the media doc's url + sizes.*.url. Required because the proxy handler
+        // returns 404 on Vercel's serverless runtime — the CDN-hosted Blob URLs
+        // work and are faster anyway (no Node round-trip). Media is fully public,
+        // so we don't need access control.
+        media: { disablePayloadAccessControl: true },
       },
       token: process.env.BLOB_READ_WRITE_TOKEN || '',
     }),
