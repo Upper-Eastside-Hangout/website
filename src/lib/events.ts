@@ -9,24 +9,12 @@
 
 /* ---------- Types matching the Events collection shape ---------- */
 
-export type MediaSize = {
-  url?: string | null
-  filename?: string | null
-  width?: number | null
-  height?: number | null
-}
-
-export type MediaDoc = {
-  id: number | string
-  url?: string | null
-  alt?: string | null
-  filename?: string | null
-  /** Payload/Sharp auto-generated crops. `og` is 1200x628 for social cards. */
-  sizes?: {
-    og?: MediaSize | null
-    thumb?: MediaSize | null
-  } | null
-}
+// MediaDoc + MediaSize types now live in @/lib/media so both Events and
+// Vendors can share them without cross-importing. Re-exported here to
+// preserve the existing public API for callers importing from '@/lib/events'.
+export type { MediaDoc, MediaSize, MediaRelation } from './media'
+import { mediaUrl, mediaAlt } from './media'
+import type { MediaDoc, MediaRelation } from './media'
 
 export type EventDoc = {
   id: string | number
@@ -63,22 +51,12 @@ export type EventDoc = {
   published: boolean
 }
 
-/**
- * Resolve a flyer URL from the upload relation. Prefers the "og" size
- * (1200x628 center-crop) when available, so displays and social cards always
- * get a consistent aspect ratio regardless of the source image dimensions.
- * Falls back to the original if the sized version isn't generated yet.
- */
-export const flyerUrl = (flyer: EventDoc['flyer']): string | null => {
-  if (!flyer) return null
-  if (typeof flyer === 'number' || typeof flyer === 'string') return null
-  return flyer.sizes?.og?.url || flyer.url || null
-}
+/** Resolve a flyer URL — thin wrapper around mediaUrl for backward compat. */
+export const flyerUrl = (flyer: EventDoc['flyer']): string | null =>
+  mediaUrl(flyer as MediaRelation)
 
-export const flyerAlt = (flyer: EventDoc['flyer'], fallback: string): string => {
-  if (!flyer || typeof flyer === 'number' || typeof flyer === 'string') return fallback
-  return flyer.alt || fallback
-}
+export const flyerAlt = (flyer: EventDoc['flyer'], fallback: string): string =>
+  mediaAlt(flyer as MediaRelation, fallback)
 
 export type EventInstance = {
   event: EventDoc

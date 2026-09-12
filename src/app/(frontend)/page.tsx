@@ -75,8 +75,8 @@ export default async function Page() {
     return {
       name: String(raw.name || ''),
       bio: (raw.bio as string) || null,
-      logoUrl: (raw.logoUrl as string) || null,
-      illustrationUrl: (raw.illustrationUrl as string) || null,
+      logo: (raw.logo as import('@/lib/media').MediaRelation) || null,
+      illustration: (raw.illustration as import('@/lib/media').MediaRelation) || null,
       websiteUrl: (raw.websiteUrl as string) || null,
       menuUrl: (raw.menuUrl as string) || null,
       instagramUrl: (raw.instagramUrl as string) || null,

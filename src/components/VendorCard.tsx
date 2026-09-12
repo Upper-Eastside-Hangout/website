@@ -2,12 +2,13 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { mediaUrl, type MediaRelation } from '@/lib/media'
 
 type Vendor = {
   name: string
   bio?: string | null
-  logoUrl?: string | null
-  illustrationUrl?: string | null
+  logo?: MediaRelation
+  illustration?: MediaRelation
   websiteUrl?: string | null
   menuUrl?: string | null
   instagramUrl?: string | null
@@ -69,8 +70,10 @@ const IconLink = ({ href, label, children }: IconLinkProps) => {
 export default function VendorCard({ vendor }: Props) {
   const [bioOpen, setBioOpen] = useState(false)
 
-  const hasIllustration = Boolean(vendor.illustrationUrl)
-  const hasLogo = Boolean(vendor.logoUrl)
+  const logoSrc = mediaUrl(vendor.logo)
+  const illustrationSrc = mediaUrl(vendor.illustration)
+  const hasIllustration = Boolean(illustrationSrc)
+  const hasLogo = Boolean(logoSrc)
   const hoverSwap = hasIllustration && hasLogo
   const hasBio = Boolean(vendor.bio && vendor.bio.trim())
 
@@ -103,7 +106,7 @@ export default function VendorCard({ vendor }: Props) {
         >
           {hasIllustration && (
             <Image
-              src={vendor.illustrationUrl as string}
+              src={illustrationSrc as string}
               alt={hoverSwap ? '' : vendor.name}
               aria-hidden={hoverSwap ? 'true' : undefined}
               fill
@@ -116,7 +119,7 @@ export default function VendorCard({ vendor }: Props) {
           )}
           {hasLogo && (
             <Image
-              src={vendor.logoUrl as string}
+              src={logoSrc as string}
               alt={vendor.name}
               fill
               sizes="(min-width: 768px) 200px, 160px"

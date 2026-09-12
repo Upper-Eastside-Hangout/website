@@ -34,19 +34,19 @@ export const Vendors: CollectionConfig = {
       },
     },
     {
-      name: 'logoUrl',
-      type: 'text',
+      name: 'logo',
+      type: 'upload',
+      relationTo: 'media',
       admin: {
-        description:
-          'Vendor brand logo as transparent PNG. Drop file at /public/vendors/ and reference as /vendors/your-file.png. Recommended 600×600 px.',
+        description: 'Vendor brand logo — transparent PNG, recommended 600×600 px. Click to upload from your computer.',
       },
     },
     {
-      name: 'illustrationUrl',
-      type: 'text',
+      name: 'illustration',
+      type: 'upload',
+      relationTo: 'media',
       admin: {
-        description:
-          'Vintage illustration for the card (matches the site’s drawn aesthetic). Transparent PNG, drop at /public/vendors/ and reference as /vendors/your-file.png. Recommended 800×800 px.',
+        description: 'Vintage illustration for the card — transparent PNG, recommended 800×800 px. Click to upload from your computer.',
       },
     },
     {
