@@ -61,11 +61,11 @@ export default async function HomePreview() {
     /* navigation table may not exist yet; render without nav */
   }
 
-  // Vendors — only published, sorted alphabetically by name.
+  // Vendors — only published, in the admin drag-and-drop order.
   const vendorResult = await payload.find({
     collection: 'vendors',
     where: { published: { equals: true } },
-    sort: 'name',
+    sort: '_order',
     limit: 100,
   })
   const vendors = vendorResult.docs.map((d) => {

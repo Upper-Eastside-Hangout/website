@@ -7,11 +7,15 @@ import type { CollectionConfig } from 'payload'
  */
 export const Vendors: CollectionConfig = {
   slug: 'vendors',
+  // Enables drag-and-drop reordering in the admin list view. Payload adds a
+  // hidden `_order` field (fractional index) and defaults sort to it, so the
+  // list view order IS the display order.
+  orderable: true,
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'published', 'order'],
+    defaultColumns: ['name', 'published'],
     description:
-      'Resident vendors with a permanent presence at the venue. Reorder by changing the Order field.',
+      'Resident vendors with a permanent presence at the venue. Drag rows in the list view (☰ handle on the left of each row) to reorder — the same order shows on the homepage.',
   },
   access: {
     read: () => true,
@@ -76,12 +80,6 @@ export const Vendors: CollectionConfig = {
       admin: {
         description: 'Full Facebook page URL. Icon shown only when populated.',
       },
-    },
-    {
-      name: 'order',
-      type: 'number',
-      defaultValue: 0,
-      admin: { description: 'Display order. Lower numbers render first.' },
     },
     {
       name: 'published',

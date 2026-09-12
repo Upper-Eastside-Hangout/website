@@ -63,11 +63,12 @@ export default async function Page() {
     console.warn('[page] navigation global not yet provisioned, rendering without nav:', err)
   }
 
-  // Vendors — only published, sorted alphabetically by name.
+  // Vendors — only published, in the admin drag-and-drop order (_order field
+  // is populated by Payload's `orderable: true` on the collection).
   const vendorResult = await payload.find({
     collection: 'vendors',
     where: { published: { equals: true } },
-    sort: 'name',
+    sort: '_order',
     limit: 100,
   })
   const vendors = vendorResult.docs.map((d) => {
