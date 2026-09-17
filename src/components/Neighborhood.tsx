@@ -15,7 +15,7 @@ type Props = {
  */
 export default function Neighborhood({ body }: Props) {
   return (
-    <section className="relative overflow-hidden text-cream">
+    <section id="about" className="relative scroll-mt-24 overflow-hidden text-cream">
       <Image
         src="/backgrounds/neighborhood.jpg"
         alt=""

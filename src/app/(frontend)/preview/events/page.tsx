@@ -15,6 +15,7 @@ export const metadata: Metadata = {
 
 type FooterGlobal = {
   address: string
+  email: string
   phone: string
   hours: string
   instagramUrl?: string
@@ -27,9 +28,6 @@ type FooterGlobal = {
   nextdoorUrl?: string
   copyrightText: string
 }
-type NavigationGlobal = {
-  links: { label: string; url: string; openInNewTab?: boolean }[]
-}
 
 export default async function EventsPreview() {
   const payload = await getPayloadClient()
@@ -37,13 +35,6 @@ export default async function EventsPreview() {
   const [footer] = (await Promise.all([
     payload.findGlobal({ slug: 'footer' }),
   ])) as [FooterGlobal]
-
-  let navigation: NavigationGlobal = { links: [] }
-  try {
-    navigation = (await payload.findGlobal({ slug: 'navigation' })) as NavigationGlobal
-  } catch {
-    /* nav table may not exist; render without */
-  }
 
   // Pull all published events. Recurrence is expanded client-of-Payload-side
   // (in this server component) so we don't need cron jobs or precomputed rows.
@@ -65,7 +56,7 @@ export default async function EventsPreview() {
 
   return (
     <main>
-      <Header links={navigation.links} />
+      <Header />
 
       <section className="bg-paper relative px-6 py-16 md:py-24">
         <div className="mx-auto max-w-3xl text-center">
@@ -89,6 +80,7 @@ export default async function EventsPreview() {
 
       <Footer
         address={footer.address}
+        email={footer.email}
         phone={footer.phone}
         hours={footer.hours}
         instagramUrl={footer.instagramUrl}

@@ -15,6 +15,13 @@ export const Footer: GlobalConfig = {
       defaultValue: '701 NE 79th St, Miami, FL 33138',
     },
     {
+      name: 'email',
+      type: 'email',
+      required: true,
+      defaultValue: 'info@uppereastsidehangout.com',
+      admin: { description: 'Contact email shown in the footer, above the phone number.' },
+    },
+    {
       name: 'phone',
       type: 'text',
       required: true,

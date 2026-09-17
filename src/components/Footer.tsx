@@ -2,6 +2,7 @@ import Image from 'next/image'
 
 type Props = {
   address: string
+  email: string
   phone: string
   hours: string
   instagramUrl?: string
@@ -27,6 +28,13 @@ const PinIcon = () => (
 const PhoneIcon = () => (
   <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M5 4h3l2 5-2.5 1.5a11 11 0 0 0 6 6L15 14l5 2v3a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z" />
+  </svg>
+)
+
+const MailIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="5" width="18" height="14" rx="2" />
+    <path d="M3 7l9 6 9-6" />
   </svg>
 )
 
@@ -120,6 +128,7 @@ const SocialLink = ({ href, label, children }: SocialLinkProps) => {
 
 export default function Footer({
   address,
+  email,
   phone,
   hours,
   instagramUrl,
@@ -143,7 +152,7 @@ export default function Footer({
     nextdoorUrl
 
   return (
-    <footer className="relative overflow-hidden text-cream">
+    <footer id="contact" className="relative scroll-mt-24 overflow-hidden text-cream">
       <Image
         src="/backgrounds/footer.jpg"
         alt=""
@@ -171,6 +180,12 @@ export default function Footer({
             <p className="flex items-center justify-center gap-4 md:justify-start">
               <PinIcon />
               <span>{address}</span>
+            </p>
+            <p className="flex items-center justify-center gap-4 md:justify-start">
+              <MailIcon />
+              <a href={`mailto:${email}`} className="hover:text-cream">
+                {email}
+              </a>
             </p>
             <p className="flex items-center justify-center gap-4 md:justify-start">
               <PhoneIcon />

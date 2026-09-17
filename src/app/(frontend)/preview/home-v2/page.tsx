@@ -29,6 +29,7 @@ type SignupGlobal = {
 }
 type FooterGlobal = {
   address: string
+  email: string
   phone: string
   hours: string
   instagramUrl?: string
@@ -41,10 +42,6 @@ type FooterGlobal = {
   nextdoorUrl?: string
   copyrightText: string
 }
-type NavigationGlobal = {
-  links: { label: string; url: string; openInNewTab?: boolean }[]
-}
-
 export default async function HomePreview() {
   const payload = await getPayloadClient()
 
@@ -54,13 +51,6 @@ export default async function HomePreview() {
     payload.findGlobal({ slug: 'signupSection' }),
     payload.findGlobal({ slug: 'footer' }),
   ])) as [HeroGlobal, NeighborhoodGlobal, SignupGlobal, FooterGlobal]
-
-  let navigation: NavigationGlobal = { links: [] }
-  try {
-    navigation = (await payload.findGlobal({ slug: 'navigation' })) as NavigationGlobal
-  } catch {
-    /* navigation table may not exist yet; render without nav */
-  }
 
   // Vendors — only published, in the admin drag-and-drop order.
   const vendorResult = await payload.find({
@@ -103,7 +93,7 @@ export default async function HomePreview() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
       />
 
-      <Header links={navigation.links} />
+      <Header />
 
       <Hero
         tagline={hero.tagline}
@@ -132,6 +122,7 @@ export default async function HomePreview() {
 
       <Footer
         address={footer.address}
+        email={footer.email}
         phone={footer.phone}
         hours={footer.hours}
         instagramUrl={footer.instagramUrl}

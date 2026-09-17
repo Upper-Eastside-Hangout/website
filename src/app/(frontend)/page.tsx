@@ -27,6 +27,7 @@ type SignupGlobal = {
 }
 type FooterGlobal = {
   address: string
+  email: string
   phone: string
   hours: string
   instagramUrl?: string
@@ -39,10 +40,6 @@ type FooterGlobal = {
   nextdoorUrl?: string
   copyrightText: string
 }
-type NavigationGlobal = {
-  links?: Array<{ label: string; url: string; openInNewTab?: boolean | null }> | null
-}
-
 export default async function Page() {
   const payload = await getPayloadClient()
 
@@ -53,16 +50,6 @@ export default async function Page() {
     payload.findGlobal({ slug: 'signupSection' }),
     payload.findGlobal({ slug: 'footer' }),
   ])) as [HeroGlobal, NeighborhoodGlobal, SignupGlobal, FooterGlobal]
-
-  // Navigation fetch isolated in try/catch — on first deploy after adding the
-  // navigation global, the Postgres tables don't exist until Payload's push
-  // runs at runtime. Until then we render the page with no nav rather than 500.
-  let navigation: NavigationGlobal = { links: [] }
-  try {
-    navigation = (await payload.findGlobal({ slug: 'navigation' })) as NavigationGlobal
-  } catch (err) {
-    console.warn('[page] navigation global not yet provisioned, rendering without nav:', err)
-  }
 
   // Vendors — only published, in the admin drag-and-drop order (_order field
   // is populated by Payload's `orderable: true` on the collection).
@@ -106,7 +93,7 @@ export default async function Page() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
       />
 
-      <Header links={navigation?.links || []} />
+      <Header />
 
       <Hero
         tagline={hero.tagline}
@@ -134,6 +121,7 @@ export default async function Page() {
 
       <Footer
         address={footer.address}
+        email={footer.email}
         phone={footer.phone}
         hours={footer.hours}
         instagramUrl={footer.instagramUrl}

@@ -15,6 +15,13 @@ html, body {
   text-rendering: optimizeLegibility;
 }
 
+/* Smooth-scroll for in-page hash navigation (nav menu → section anchors,
+ * Hero CTA → #signup). Neutralized inside the prefers-reduced-motion block
+ * below so users who ask for reduced motion get instant jumps. */
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: var(--font-body, Georgia, serif);
 }

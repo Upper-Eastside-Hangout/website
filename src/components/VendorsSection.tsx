@@ -19,7 +19,7 @@ export default function VendorsSection({
   if (!vendors.length) return null
 
   return (
-    <section className="bg-paper relative px-6 py-16 md:py-24">
+    <section id="vendors" className="bg-paper relative scroll-mt-24 px-6 py-16 md:py-24">
       <div className="mx-auto max-w-6xl">
         <SectionReveal>
           <div className="text-center">

@@ -20,6 +20,7 @@ type Args = { params: Promise<{ slug: string }> }
 
 type FooterGlobal = {
   address: string
+  email: string
   phone: string
   hours: string
   instagramUrl?: string
@@ -31,9 +32,6 @@ type FooterGlobal = {
   tripadvisorUrl?: string
   nextdoorUrl?: string
   copyrightText: string
-}
-type NavigationGlobal = {
-  links: { label: string; url: string; openInNewTab?: boolean }[]
 }
 
 const fetchEvent = async (slug: string): Promise<EventDoc | null> => {
@@ -86,10 +84,6 @@ export default async function EventDetailPage({ params }: Args) {
 
   const payload = await getPayloadClient()
   const footer = (await payload.findGlobal({ slug: 'footer' })) as FooterGlobal
-  let navigation: NavigationGlobal = { links: [] }
-  try {
-    navigation = (await payload.findGlobal({ slug: 'navigation' })) as NavigationGlobal
-  } catch { /* nav table may not exist */ }
 
   const url = process.env.NEXT_PUBLIC_SERVER_URL || 'https://uppereastsidehangout.com'
   const pageUrl = `${url}/events/${event.slug}`
@@ -115,7 +109,7 @@ export default async function EventDetailPage({ params }: Args) {
         />
       )}
 
-      <Header links={navigation.links} />
+      <Header />
 
       <article className="bg-paper relative px-6 py-16 md:py-24">
         <div className="mx-auto max-w-3xl">
@@ -213,6 +207,7 @@ export default async function EventDetailPage({ params }: Args) {
 
       <Footer
         address={footer.address}
+        email={footer.email}
         phone={footer.phone}
         hours={footer.hours}
         instagramUrl={footer.instagramUrl}

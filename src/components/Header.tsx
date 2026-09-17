@@ -2,22 +2,40 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 
-type NavLink = {
-  label: string
-  url: string
-  openInNewTab?: boolean | null
-}
-
-type Props = {
-  links: NavLink[]
-}
-
 /**
- * Header — hamburger button fixed at the top-right corner of every public
- * page. Clicking the button opens a full-screen vintage-style overlay menu
- * with all nav links (sourced from the Payload navigation global).
+ * Header — hardcoded site navigation.
+ *
+ * Menu is code-owned because each item (except DIRECTIONS) scrolls to a
+ * specific homepage section by id. Letting an admin edit these in the CMS
+ * would risk silently breaking the scroll target if labels/hrefs drift.
+ *
+ * Mobile: hamburger button pinned top-LEFT, opens a full-screen forest
+ * overlay with the same links stacked vertically.
+ *
+ * Desktop (md ≥ 768px): a fixed top nav bar renders across the page with
+ * links right-aligned; hamburger + overlay hidden.
+ *
+ * All hash hrefs use plain <a>. Smooth-scroll is handled by the global
+ * `html { scroll-behavior: smooth }` rule (respects prefers-reduced-motion).
  */
-export default function Header({ links }: Props) {
+
+type NavItem = {
+  label: string
+  href: string
+  /** Opens in a new tab with rel="noopener noreferrer". */
+  external?: boolean
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { label: 'HOME', href: '/' },
+  { label: 'EVENTS', href: '/#events' },
+  { label: 'VENDORS', href: '/#vendors' },
+  { label: 'ABOUT', href: '/#about' },
+  { label: 'CONTACT', href: '/#contact' },
+  { label: 'DIRECTIONS', href: 'https://maps.app.goo.gl/oV3tQHeEHFHxZDf79', external: true },
+]
+
+export default function Header() {
   const [open, setOpen] = useState(false)
   const prefersReduced = useReducedMotion()
 
@@ -37,22 +55,42 @@ export default function Header({ links }: Props) {
     }
   }, [open])
 
-  // Don't render anything if there are no links to show.
-  if (!links || links.length === 0) return null
-
   return (
     <>
+      {/* Mobile hamburger — pinned top-left, hidden on md+ */}
       <button
         type="button"
         aria-label={open ? 'Close menu' : 'Open menu'}
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="fixed right-5 top-5 z-50 inline-flex h-12 w-12 items-center justify-center rounded-full border border-forest/15 bg-cream-50/85 text-forest shadow-sm backdrop-blur transition hover:bg-cream-50 md:right-8 md:top-8"
+        className="fixed left-5 top-5 z-50 inline-flex h-12 w-12 items-center justify-center rounded-full border border-forest/15 bg-cream-50/85 text-forest shadow-sm backdrop-blur transition hover:bg-cream-50 md:hidden"
       >
         <span className="sr-only">{open ? 'Close menu' : 'Open menu'}</span>
         <HamburgerIcon open={open} />
       </button>
 
+      {/* Desktop nav — fixed top bar, hidden on mobile */}
+      <nav
+        aria-label="Site"
+        className="fixed left-0 right-0 top-0 z-40 hidden border-b border-cream/10 bg-forest/85 backdrop-blur-sm md:block"
+      >
+        <ul className="mx-auto flex max-w-6xl items-center justify-end gap-8 px-8 py-4 font-label text-sm uppercase tracking-[0.22em] text-cream">
+          {NAV_ITEMS.map((item) => (
+            <li key={item.label}>
+              <a
+                href={item.href}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noopener noreferrer' : undefined}
+                className="transition hover:text-mustard"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      {/* Mobile overlay */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -60,23 +98,23 @@ export default function Header({ links }: Props) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: prefersReduced ? 0 : 0.25, ease: 'easeOut' }}
-            className="fixed inset-0 z-40 flex items-center justify-center bg-forest text-cream"
+            className="fixed inset-0 z-40 flex items-center justify-center bg-forest text-cream md:hidden"
             role="dialog"
             aria-modal="true"
             aria-label="Site navigation"
           >
             <nav className="px-6">
-              <ul className="space-y-7 text-center md:space-y-10">
-                {links.map((link, i) => (
-                  <li key={`${link.label}-${i}`}>
+              <ul className="space-y-7 text-center">
+                {NAV_ITEMS.map((item) => (
+                  <li key={item.label}>
                     <a
-                      href={link.url}
-                      target={link.openInNewTab ? '_blank' : undefined}
-                      rel={link.openInNewTab ? 'noopener noreferrer' : undefined}
+                      href={item.href}
+                      target={item.external ? '_blank' : undefined}
+                      rel={item.external ? 'noopener noreferrer' : undefined}
                       onClick={() => setOpen(false)}
-                      className="inline-block font-label text-3xl uppercase tracking-[0.22em] text-cream transition hover:text-mustard md:text-5xl"
+                      className="inline-block font-label text-3xl uppercase tracking-[0.22em] text-cream transition hover:text-mustard"
                     >
-                      {link.label}
+                      {item.label}
                     </a>
                   </li>
                 ))}
