@@ -4,6 +4,7 @@ import Header from '@/components/Header'
 import Hero from '@/components/Hero'
 import Neighborhood from '@/components/Neighborhood'
 import VendorsSection from '@/components/VendorsSection'
+import HappeningNext from '@/components/HappeningNext'
 import SignupForm from '@/components/SignupForm'
 import Footer from '@/components/Footer'
 import { restaurantSchema, parseAddress, normalizeTelephone } from '@/lib/schema'
@@ -110,6 +111,8 @@ export default async function HomePreview() {
         ctaButtonText={hero.ctaButtonText}
         ctaTarget="#signup"
       />
+
+      <HappeningNext />
 
       {/* NEW SECTION — vendor grid, between Hero and Neighborhood */}
       <VendorsSection vendors={vendors} />

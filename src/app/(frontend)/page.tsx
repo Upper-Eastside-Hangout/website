@@ -3,6 +3,7 @@ import Header from '@/components/Header'
 import Hero from '@/components/Hero'
 import Neighborhood from '@/components/Neighborhood'
 import VendorsSection from '@/components/VendorsSection'
+import HappeningNext from '@/components/HappeningNext'
 import SignupForm from '@/components/SignupForm'
 import Footer from '@/components/Footer'
 import { restaurantSchema, parseAddress, normalizeTelephone } from '@/lib/schema'
@@ -113,6 +114,8 @@ export default async function Page() {
         ctaButtonText={hero.ctaButtonText}
         ctaTarget="#signup"
       />
+
+      <HappeningNext />
 
       <VendorsSection vendors={vendors} />
 
