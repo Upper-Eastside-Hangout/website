@@ -12,11 +12,19 @@ import SectionReveal from './SectionReveal'
  * postMessage listener that auto-resizes the iframe height as the user
  * navigates inside it, so we don't need to set a fixed height.
  *
+ * IMPORTANT: the loader's postMessage handler calls
+ * `element.scrollIntoView({behavior: 'smooth', block: 'start'})` on a
+ * message from the child iframe that fires immediately on load. If we
+ * inject the script on mount, the browser scroll-jumps to this section
+ * on first paint. To avoid that we gate injection behind an
+ * IntersectionObserver — the script only runs once the section is
+ * already in the viewport, so the scrollIntoView call is a no-op.
+ *
  * The loader uses `document.write()` as a fallback when the container is
  * missing, which would clobber the whole page after DOMContentLoaded —
  * so we render the container div in JSX first, then inject the script tag
- * on mount. React StrictMode double-invokes effects in dev; guarded with
- * a ref so the script only injects once.
+ * once observed. React StrictMode double-invokes effects in dev; guarded
+ * with a ref so the script only injects once.
  */
 export default function HappeningNext({
   heading = 'Happening Next',
@@ -26,20 +34,44 @@ export default function HappeningNext({
   eyebrow?: string
 }) {
   const injected = useRef(false)
+  const containerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    if (injected.current) return
-    injected.current = true
+    const target = containerRef.current
+    if (!target || injected.current) return
 
-    const script = document.createElement('script')
-    script.src = 'https://www.fourvenues.com/assets/iframe/upper-eastside-hangout/events'
-    script.async = true
-    script.dataset.fvEvents = 'true'
-    document.body.appendChild(script)
+    const inject = () => {
+      if (injected.current) return
+      injected.current = true
+      const script = document.createElement('script')
+      script.src = 'https://www.fourvenues.com/assets/iframe/upper-eastside-hangout/events'
+      script.async = true
+      script.dataset.fvEvents = 'true'
+      document.body.appendChild(script)
+    }
 
-    // No teardown — the FourVenues iframe attaches window-level postMessage
-    // listeners and creating a fresh one on every re-mount would leak them.
-    // The homepage doesn't unmount the section in normal navigation.
+    // Fall back to eager injection if IntersectionObserver isn't available.
+    if (typeof IntersectionObserver === 'undefined') {
+      inject()
+      return
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            inject()
+            io.disconnect()
+            break
+          }
+        }
+      },
+      // rootMargin lets us start the load a bit before the section enters
+      // view so the iframe is ready by the time the user gets there.
+      { rootMargin: '200px 0px' },
+    )
+    io.observe(target)
+    return () => io.disconnect()
   }, [])
 
   return (
@@ -65,7 +97,7 @@ export default function HappeningNext({
         </SectionReveal>
 
         <SectionReveal delay={0.1}>
-          <div className="mt-12">
+          <div className="mt-12" ref={containerRef}>
             {/* FourVenues injects the events iframe into this container */}
             <div id="fourvenues-iframe" />
           </div>

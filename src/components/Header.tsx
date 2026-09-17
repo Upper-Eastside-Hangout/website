@@ -74,7 +74,7 @@ export default function Header() {
         aria-label="Site"
         className="fixed left-0 right-0 top-0 z-40 hidden border-b border-cream/10 bg-forest/85 backdrop-blur-sm md:block"
       >
-        <ul className="mx-auto flex max-w-6xl items-center justify-end gap-8 px-8 py-4 font-label text-sm uppercase tracking-[0.22em] text-cream">
+        <ul className="mx-auto flex max-w-6xl items-center justify-center gap-8 px-8 py-4 font-label text-sm uppercase tracking-[0.22em] text-cream">
           {NAV_ITEMS.map((item) => (
             <li key={item.label}>
               <a
